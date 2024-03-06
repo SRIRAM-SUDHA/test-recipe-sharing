@@ -7,8 +7,8 @@ router.post("/add-recipe", authenticate, recipe.addRecipe);
 
 router.get("/recipes", authenticate, recipe.getRecipes);
 
-router.put("/recipe/:id", authenticate, recipe.updateRecipe);
+router.put("/update/:id", authenticate, recipe.updateRecipe);
 
-router.delete("/recipe/:id", authenticate, recipe.deleteRecipe);
+router.delete("/delete/:id", authenticate, recipe.deleteRecipe);
 
 module.exports = router;

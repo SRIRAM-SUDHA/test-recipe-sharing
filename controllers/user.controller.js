@@ -1,16 +1,11 @@
 const bcrypt = require("bcrypt");
-const { open } = require("sqlite");
-const sqlite3 = require("sqlite3");
-const path = require("path");
-const dbPath = path.join(__dirname, "recipe.db");
-
+const jwt = require("jsonwebtoken");
+const { dbPromise } = require("../db");
 class User {
   // SIGN UP
   signUp = async (req, res) => {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
-    });
+    const db = await dbPromise;
+    console.log(db);
     const { username, name, password, gender } = req.body;
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const selectUserQuery = `SELECT * FROM user WHERE username = '${username}'`;
@@ -36,10 +31,7 @@ class User {
 
   //User login
   login = async (req, res) => {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
-    });
+    const db = await dbPromise;
     const { username, password } = req.body;
     const queryForUser = "SELECT * FROM user WHERE username = ?";
 
@@ -53,7 +45,7 @@ class User {
           const payload = { username: username };
           const jwtToken = jwt.sign(payload, process.env.JWT_SECRET_KEY);
           res.status(200).send({ jwtToken });
-          console({ jwtToken });
+          console.log({ jwtToken });
         } else {
           res.status(400).send("Invalid password");
         }
@@ -65,10 +57,7 @@ class User {
   };
 
   getProfile = async (req, res) => {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
-    });
+    const db = await dbPromise;
     const { username } = req.payload; // Access username from decoded token
     const queryForUser = "SELECT * FROM user WHERE username = ?";
 

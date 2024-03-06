@@ -1,17 +1,12 @@
 const { open } = require("sqlite");
-const sqlite3 = require("sqlite3");
-const path = require("path");
-const dbPath = path.join(__dirname, "recipe.db");
-
+const jwt = require("jsonwebtoken");
+const { dbPromise } = require("../db");
 class Recipe {
   // INSERT RECIPES
   addRecipe = async (req, res) => {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
-    });
+    const db = await dbPromise;
     const { title, description, ingredients, instructions, images } = req.body;
-    const userId = req.payload.userId; // Access user ID from decoded token
+    const userId = req.payload.username; // Access user ID from decoded token
     const query =
       "INSERT INTO recipes (title, description, ingredients, instructions, images, createdBy) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -21,7 +16,7 @@ class Recipe {
         description,
         ingredients,
         instructions,
-        image,
+        images,
         userId,
       ]);
       res.status(201).send("Recipe created successfully");
@@ -33,10 +28,7 @@ class Recipe {
 
   // GET ALL RECIPIES
   getRecipes = async (req, res) => {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
-    });
+    const db = await dbPromise;
     const query = "SELECT * FROM recipes";
 
     try {
@@ -50,11 +42,7 @@ class Recipe {
 
   //UPDATE RECIPIES
   updateRecipe = async (req, res) => {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
-    });
-
+    const db = await dbPromise;
     const recipeId = req.params.id;
     const { title, description, ingredients, instructions, images } = req.body;
 
@@ -79,10 +67,7 @@ class Recipe {
 
   //DELETE THE RECIPIES
   deleteRecipe = async (req, res) => {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
-    });
+    const db = await dbPromise;
     const recipeId = req.params.id;
 
     const query = "DELETE FROM recipes WHERE id = ?";
